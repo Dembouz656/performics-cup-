@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Arbre des Phases Finales - Performics Cup</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      background: linear-gradient(to bottom, #ffa500, #ffffff);
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+
+    header {
+      background-color: white;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 3px solid #ff7f00;
+    }
+
+    .branding {
+      display: flex;
+      align-items: center;
+      color: #ff7f00;
+      font-weight: bold;
+      font-size: 1.2em;
+    }
+
+    .branding img {
+      height: 40px;
+      margin-right: 10px;
+    }
+
+    nav a {
+      margin: 0 10px;
+      color: #ff7f00;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    nav a:hover,
+    nav a.active {
+      border-bottom: 2px solid #ff7f00;
+    }
+
+    h1 {
+      text-align: center;
+      color: #fff;
+      background-color: #ff7f00;
+      padding: 10px;
+      border-radius: 10px;
+    }
+
+    .bracket {
+      display: flex;
+      justify-content: space-around;
+      align-items: stretch;
+      margin-top: 50px;
+      position: relative;
+    }
+
+    .round {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      align-items: center;
+      gap: 40px;
+      position: relative;
+    }
+
+    .match {
+      background-color: white;
+      border: 2px solid #ff7f00;
+      border-radius: 10px;
+      padding: 15px 25px;
+      width: 180px;
+      text-align: center;
+      font-weight: bold;
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+      position: relative;
+    }
+
+    .match span {
+      display: block;
+      font-weight: bold;
+      color: green;
+      font-size: 1.1em;
+    }
+
+    footer {
+      margin-top: 60px;
+      text-align: center;
+      color: #333;
+      font-size: 0.9em;
+    }
+
+    @media (max-width: 768px) {
+      .bracket {
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="branding">
+      <img src="logo.jpg" alt="Logo Performics" />
+      <span>Performics Cup</span>
+    </div>
+    <nav>
+      <a href="index.html">Accueil</a>
+      <a href="calendrier.html">Calendrier</a>
+      <a href="resultats.html">Résultats</a>
+      <a href="buteurs.html">Buteurs</a>
+      <a href="classement.html">Classement</a>
+      <a href="tirage.html">Tirage</a>
+      <a href="arbre.html" class="active">Arbre</a>
+      <a href="contact.html">Contact</a>
+      <a href="statistiques.html">Statistiques</a>
+    </nav>
+  </header>
+
+  <h1>Tableau des Phases Finales</h1>
+
+  <div class="bracket">
+   
+    <div class="round" id="quarts"></div>
+
+    
+    <div class="round" id="demis" style="margin-top: 80px;"></div>
+
+    
+    <div class="round" id="finale" style="margin-top: 160px;"></div>
+  </div>
+
+  <footer>
+    &copy; 2025 Performics Cup. Tous droits réservés.
+  </footer>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const qualified = JSON.parse(localStorage.getItem('qualifiedTeams')) || [];
+      const gagnants = JSON.parse(localStorage.getItem('gagnantsFinales')) || {};
+
+      // Trier les équipes par poule et position
+      const pouleA = qualified.filter(e => e.poule === 'A').sort((a, b) => a.position - b.position);
+      const pouleB = qualified.filter(e => e.poule === 'B').sort((a, b) => a.position - b.position);
+
+      // Définir les quarts de finale
+      const quarts = [
+        [pouleA[0]?.nom || "A1", pouleB[3]?.nom || "B4"],
+        [pouleB[1]?.nom || "B2", pouleA[2]?.nom || "A3"],
+        [pouleB[0]?.nom || "B1", pouleA[3]?.nom || "A4"],
+        [pouleA[1]?.nom || "A2", pouleB[2]?.nom || "B3"]
+      ];
+
+      const quartsDiv = document.getElementById('quarts');
+      const demisDiv = document.getElementById('demis');
+      const finaleDiv = document.getElementById('finale');
+
+      const winnersQ = [];
+
+      quarts.forEach((match, i) => {
+        const div = document.createElement('div');
+        div.className = 'match';
+        div.id = `quart${i + 1}`;
+
+        const key = `quart-${i + 1}`;
+        const winner = gagnants[key];
+
+        const label = winner
+          ? `<span>${winner}</span>`
+          : `${match[0]}<br><strong>vs</strong><br>${match[1]}`;
+
+        div.innerHTML = label;
+        quartsDiv.appendChild(div);
+
+        if (winner) winnersQ.push(winner);
+      });
+
+      const winnersD = [];
+
+      for (let i = 0; i < 2; i++) {
+        const team1 = winnersQ[2 * i] || `Vainqueur Q${2 * i + 1}`;
+        const team2 = winnersQ[2 * i + 1] || `Vainqueur Q${2 * i + 2}`;
+        const key = `demi-${i + 1}`;
+        const winner = gagnants[key];
+
+        const div = document.createElement('div');
+        div.className = 'match';
+        div.id = `demi${i + 1}`;
+
+        const label = winner
+          ? `<span>${winner}</span>`
+          : `${team1}<br><strong>vs</strong><br>${team2}`;
+
+        div.innerHTML = label;
+        demisDiv.appendChild(div);
+
+        if (winner) winnersD.push(winner);
+      }
+
+      const team1Final = winnersD[0] || 'Vainqueur D1';
+      const team2Final = winnersD[1] || 'Vainqueur D2';
+      const winnerFinal = gagnants['final-1'];
+
+      const finale = document.createElement('div');
+      finale.className = 'match';
+      finale.id = 'finaleMatch';
+
+      const finalLabel = winnerFinal
+        ? `<span>${winnerFinal}</span>`
+        : `${team1Final}<br><strong>vs</strong><br>${team2Final}`;
+
+      finale.innerHTML = finalLabel;
+      finaleDiv.appendChild(finale);
+    });
+  </script>
+
+</body>
+</html>

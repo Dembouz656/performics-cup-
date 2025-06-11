@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Buteurs - Performics Cup</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+
+    form {
+      margin-bottom: 30px;
+    }
+
+    input, select, button {
+      padding: 8px;
+      margin: 5px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 2em;
+    }
+
+    th, td {
+      padding: 10px;
+      border: 1px solid #ccc;
+      text-align: left;
+    }
+
+    thead {
+      background-color: #f9f9f9;
+    }
+
+    .match-section {
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="branding">
+    <img src="logo.jpg" alt="Logo Performics" style="height: 50px;">
+    <span style="font-size: 24px; font-weight: bold; margin-left: 10px;">Performics Cup</span>
+  </div>
+  <nav>
+    <a href="index.html">Accueil</a>
+    <a href="calendrier.html">Calendrier</a>
+    <a href="resultats.html">Résultats</a>
+    <a href="classement.html">Classement</a>
+    <a href="buteurs.html" class="active">Buteurs</a>
+    <a href="contact.html">Contact</a>
+  </nav>
+</header>
+
+<main>
+  <h1>Ajouter un Buteur</h1>
+
+<form id="scorerForm">
+  <select id="matchSelector" required>
+    <option value="">Sélectionner un match</option>
+  </select>
+  <input type="text" id="team" placeholder="Équipe" required>
+  <input type="text" id="player" placeholder="Nom du buteur" required>
+  <input type="number" id="goals" placeholder="Nombre de buts" min="1" required>
+  <button type="submit">Ajouter</button>
+</form>
+
+<h2>Classement des Buteurs</h2>
+<div id="topScorersTable"></div>
+
+<script>
+  // Données stockées localement
+  let matches = JSON.parse(localStorage.getItem('matches')) || [];
+  let scorers = JSON.parse(localStorage.getItem('scorers')) || {};
+
+  const matchSelector = document.getElementById('matchSelector');
+
+  function populateMatchSelector() {
+    matchSelector.innerHTML = '<option value="">Sélectionner un match</option>';
+    matches.forEach(match => {
+      const option = document.createElement('option');
+      option.value = match.id;
+      option.textContent = `${match.journee} - ${match.team1} vs ${match.team2}`;
+      matchSelector.appendChild(option);
+    });
+  }
+
+  function addScorer(e) {
+    e.preventDefault();
+
+    const matchId = matchSelector.value;
+    const team = document.getElementById('team').value.trim();
+    const player = document.getElementById('player').value.trim();
+    const goals = parseInt(document.getElementById('goals').value, 10);
+
+    const match = matches.find(m => m.id == matchId);
+    if (!match || (team !== match.team1 && team !== match.team2)) {
+      alert("Équipe non valide pour ce match.");
+      return;
+    }
+
+    if (!scorers[matchId]) scorers[matchId] = [];
+    scorers[matchId].push({ team, player, goals });
+
+    localStorage.setItem('scorers', JSON.stringify(scorers));
+    document.getElementById('scorerForm').reset();
+    renderTopScorersOnly();
+  }
+
+  function renderTopScorersOnly() {
+    const allScorers = {};
+
+    for (const matchScorers of Object.values(scorers)) {
+      matchScorers.forEach(({ player, team, goals }) => {
+        const key = `${player} - ${team}`;
+        if (!allScorers[key]) {
+          allScorers[key] = 0;
+        }
+        allScorers[key] += goals;
+      });
+    }
+
+    const sortedScorers = Object.entries(allScorers).sort((a, b) => b[1] - a[1]);
+
+    const container = document.getElementById('topScorersTable');
+    container.innerHTML = ''; // Clear previous content
+
+    const table = document.createElement('table');
+    table.innerHTML = `
+      <thead>
+        <tr>
+          <th>Joueur</th>
+          <th>Équipe</th>
+          <th>Buts</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    `;
+
+    const tbody = table.querySelector('tbody');
+    sortedScorers.forEach(([fullName, goals]) => {
+      const [player, team] = fullName.split(' - ');
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${player}</td>
+        <td>${team}</td>
+        <td>${goals}</td>
+      `;
+      tbody.appendChild(row);
+    });
+
+    container.appendChild(table);
+  }
+
+  document.getElementById('scorerForm').addEventListener('submit', addScorer);
+
+  // Initialisation
+  populateMatchSelector();
+  renderTopScorersOnly();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Résultats - Performics Cup</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <div class="branding vertical">
+    <img src="logo.jpg" alt="Logo Performics">
+    <span>Performics Cup</span>
+  </div>
+  <nav>
+    <a href="index.html">Accueil</a>
+    <a href="calendrier.html">Calendrier</a>
+    <a href="resultats.html" class="active">Résultats</a>
+    <a href="classement.html">Classement</a>
+    <a href="buteurs.html">Buteurs</a>
+    <a href="contact.html">Contact</a>
+    <a href="statistiques.html">Statistiques</a>
+  </nav>
+</header>
+
+<main>
+  <h1>Résultats des Matchs</h1>
+
+  <section id="resultatsA">
+    <h2>Poule A</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Équipe 1</th>
+          <th>Équipe 2</th>
+          <th>Score</th>
+          <th>Date</th>
+          <th>Heure</th>
+          <th>Lieu</th>
+        </tr>
+      </thead>
+      <tbody id="tableA"></tbody>
+    </table>
+  </section>
+
+  <section id="resultatsB">
+    <h2>Poule B</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Équipe 1</th>
+          <th>Équipe 2</th>
+          <th>Score</th>
+          <th>Date</th>
+          <th>Heure</th>
+          <th>Lieu</th>
+        </tr>
+      </thead>
+      <tbody id="tableB"></tbody>
+    </table>
+  </section>
+
+  <section id="resultatsFinales">
+    <h2>Phases Finales</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Phase</th>
+          <th>Équipe 1</th>
+          <th>Équipe 2</th>
+          <th>Score</th>
+          <th>Date</th>
+          <th>Heure</th>
+          <th>Lieu</th>
+        </tr>
+      </thead>
+      <tbody id="tableFinales"></tbody>
+    </table>
+  </section>
+</main>
+
+<footer>
+  &copy; 2025 Performics Cup. Tous droits réservés.
+</footer>
+
+<script>
+  const matches = JSON.parse(localStorage.getItem('matches')) || [];
+  const gagnants = {};
+  const compteurPhases = {
+    "Quart de finale": 1,
+    "Demi-finale": 1,
+    "Finale": 1
+  };
+
+  function displayResults() {
+    const tableA = document.getElementById('tableA');
+    const tableB = document.getElementById('tableB');
+    const tableFinales = document.getElementById('tableFinales');
+
+    tableA.innerHTML = '';
+    tableB.innerHTML = '';
+    tableFinales.innerHTML = '';
+
+    matches.forEach(match => {
+      if (match.score1 === null || match.score2 === null) return;
+
+      const score = `${match.score1} - ${match.score2}`;
+      const date = match.date || '-';
+      const time = match.time || '-';
+      const location = match.location || '-';
+
+      const row = document.createElement('tr');
+
+      if (match.poule === 'A' || match.poule === 'B') {
+        row.innerHTML = `
+          <td>${match.team1}</td>
+          <td>${match.team2}</td>
+          <td>${score}</td>
+          <td>${date}</td>
+          <td>${time}</td>
+          <td>${location}</td>
+        `;
+        match.poule === 'A' ? tableA.appendChild(row) : tableB.appendChild(row);
+      }
+
+      if (match.phaseFinale) {
+        const rowFinale = document.createElement('tr');
+        rowFinale.innerHTML = `
+          <td>${match.phaseFinale}</td>
+          <td>${match.team1}</td>
+          <td>${match.team2}</td>
+          <td>${score}</td>
+          <td>${date}</td>
+          <td>${time}</td>
+          <td>${location}</td>
+        `;
+        tableFinales.appendChild(rowFinale);
+
+        // Générer un identifiant clair pour la phase
+        let suffixe = compteurPhases[match.phaseFinale]++;
+        let key = '';
+
+        if (match.phaseFinale === 'Quart de finale') key = `quart${suffixe}`;
+        else if (match.phaseFinale === 'Demi-finale') key = `demi${suffixe}`;
+        else if (match.phaseFinale === 'Finale') key = 'finale';
+
+        // Déterminer le gagnant
+        if (match.score1 > match.score2) {
+          gagnants[key] = match.team1;
+        } else if (match.score2 > match.score1) {
+          gagnants[key] = match.team2;
+        }
+      }
+    });
+
+    localStorage.setItem('gagnantsFinales', JSON.stringify(gagnants));
+  }
+
+  displayResults();
+</script>
+
+</body>
+</html>

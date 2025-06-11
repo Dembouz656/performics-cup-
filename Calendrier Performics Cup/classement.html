@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Classement - Performics Cup</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    tr.qualifie { background-color: #c8f7c5; }
+    tr.elimine { background-color: #fc0c0c; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 2em; }
+    th, td { padding: 15px; text-align: center; border: 1px solid #ccc; color: black; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="branding">
+      <img src="logo.jpg" alt="Logo Performics" />
+      <span>Performics Cup</span>
+    </div>
+    <nav>
+      <a href="index.html">Accueil</a>
+      <a href="calendrier.html">Calendrier</a>
+      <a href="resultats.html">Résultats</a>
+      <a href="buteurs.html">Buteurs</a>
+      <a href="classement.html" class="active">Classement</a>
+      <a href="arbre.html">Arbre</a>
+      <a href="contact.html">Contact</a>
+      <a href="statistiques.html">Statistiques</a>
+    </nav>
+  </header>
+
+  <main>
+    <h1>Classement des Poules</h1>
+    <section class="poule">
+      <h2>Poule A</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Équipe</th><th>MJ</th><th>G</th><th>N</th><th>P</th>
+            <th>BP</th><th>BC</th><th>Diff</th><th>Pts</th><th>CJ</th><th>CR</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+    <section class="poule">
+      <h2>Poule B</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Équipe</th><th>MJ</th><th>G</th><th>N</th><th>P</th>
+            <th>BP</th><th>BC</th><th>Diff</th><th>Pts</th><th>CJ</th><th>CR</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+  </main>
+
+  <script>
+    const matches = JSON.parse(localStorage.getItem('matches')) || [];
+
+    function calculateRankings(poule) {
+      const table = {};
+      matches.filter(m => m.poule === poule && m.score1 !== null && m.score2 !== null).forEach(m => {
+        [m.team1, m.team2].forEach(team => {
+          if (!table[team]) table[team] = { team, MJ: 0, G: 0, N: 0, P: 0, BP: 0, BC: 0, Pts: 0, CJ: 0, CR: 0 };
+        });
+        table[m.team1].MJ++; table[m.team2].MJ++;
+        table[m.team1].BP += m.score1; table[m.team1].BC += m.score2;
+        table[m.team2].BP += m.score2; table[m.team2].BC += m.score1;
+        table[m.team1].CJ += +m.yellow1 || 0; table[m.team1].CR += +m.red1 || 0;
+        table[m.team2].CJ += +m.yellow2 || 0; table[m.team2].CR += +m.red2 || 0;
+
+        if (m.score1 > m.score2) {
+          table[m.team1].G++; table[m.team2].P++; table[m.team1].Pts += 3;
+        } else if (m.score2 > m.score1) {
+          table[m.team2].G++; table[m.team1].P++; table[m.team2].Pts += 3;
+        } else {
+          table[m.team1].N++; table[m.team2].N++; table[m.team1].Pts++; table[m.team2].Pts++;
+        }
+      });
+
+      return Object.values(table).sort((a, b) =>
+        b.Pts - a.Pts || (b.BP - b.BC) - (a.BP - a.BC) || b.BP - a.BP
+      );
+    }
+
+    function renderTable(poule, selector) {
+      const classement = calculateRankings(poule);
+      const tbody = document.querySelector(selector);
+      tbody.innerHTML = '';
+      classement.forEach((equipe, i) => {
+        const diff = equipe.BP - equipe.BC;
+        const row = document.createElement('tr');
+        row.className = i < 4 ? 'qualifie' : 'elimine';
+        row.innerHTML = `
+          <td>${equipe.team}</td><td>${equipe.MJ}</td><td>${equipe.G}</td><td>${equipe.N}</td>
+          <td>${equipe.P}</td><td>${equipe.BP}</td><td>${equipe.BC}</td><td>${diff}</td>
+          <td>${equipe.Pts}</td><td>${equipe.CJ}</td><td>${equipe.CR}</td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    function saveQualifiedTeams() {
+      const q = [];
+      calculateRankings('A').slice(0, 4).forEach((t, i) => q.push({ nom: t.team, poule: 'A', position: i + 1 }));
+      calculateRankings('B').slice(0, 4).forEach((t, i) => q.push({ nom: t.team, poule: 'B', position: i + 1 }));
+      localStorage.setItem('qualifiedTeams', JSON.stringify(q));
+    }
+
+    renderTable('A', 'section.poule:nth-of-type(1) tbody');
+    renderTable('B', 'section.poule:nth-of-type(2) tbody');
+    saveQualifiedTeams();
+  </script>
+</body>
+</html>

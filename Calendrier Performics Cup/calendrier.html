@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Calendrier - Performics Cup</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header>
+    <div class="branding">
+      <img src="logo.jpg" alt="Logo Performics">
+      <span>Performics Cup</span>
+    </div>
+    <nav>
+      <a href="index.html">Accueil</a>
+      <a href="calendrier.html" class="active">Calendrier</a>
+      <a href="resultats.html">Résultats</a>
+      <a href="classement.html">Classement</a>
+      <a href="buteurs.html">Buteurs</a>
+      <a href="contact.html">Contact</a>
+      <a href="statistiques.html">Statistiques</a>
+    </nav>
+  </header>
+
+  <main>
+    <h1>Calendrier Performics Cup</h1>
+
+    <form id="matchForm">
+      <select id="poule">
+        <option value="">Choisir Poule</option>
+        <option value="A">Poule A</option>
+        <option value="B">Poule B</option>
+      </select>
+
+      <select id="phaseFinale">
+        <option value="">Choisir Phase Finale (facultatif)</option>
+        <option value="Quart de finale">Quart de finale</option>
+        <option value="Demi-finale">Demi-finale</option>
+        <option value="Finale">Finale</option>
+      </select>
+
+      <input type="text" id="journee" placeholder="Journée (ex : 1ère Journée)" required>
+      <input type="text" id="team1" placeholder="Équipe 1" required>
+      <input type="text" id="team2" placeholder="Équipe 2" required>
+      <input type="number" id="score1" placeholder="Score Équipe 1" min="0">
+      <input type="number" id="score2" placeholder="Score Équipe 2" min="0">
+      <input type="number" id="yellow1" placeholder="Cartons Jaunes Équipe 1" min="0">
+      <input type="number" id="red1" placeholder="Cartons Rouges Équipe 1" min="0">
+      <input type="number" id="yellow2" placeholder="Cartons Jaunes Équipe 2" min="0">
+      <input type="number" id="red2" placeholder="Cartons Rouges Équipe 2" min="0">
+      <input type="date" id="date" required>
+      <input type="time" id="time" required>
+      <input type="text" id="location" placeholder="Lieu" required>
+      <button type="submit">Ajouter Match</button>
+      <button type="button" onclick="resetTournament()">Réinitialiser</button>
+    </form>
+
+    <section id="matchesContainer"></section>
+  </main>
+
+  <footer>
+    &copy; 2025 Performics Cup. Tous droits réservés.
+  </footer>
+
+  <script>
+    let matches = JSON.parse(localStorage.getItem('matches')) || [];
+
+    function saveMatches() {
+      localStorage.setItem('matches', JSON.stringify(matches));
+    }
+
+    function addMatch(e) {
+      e.preventDefault();
+
+      const poule = document.getElementById('poule').value;
+      const phaseFinale = document.getElementById('phaseFinale').value;
+      const journee = document.getElementById('journee').value.trim();
+      const team1 = document.getElementById('team1').value.trim();
+      const team2 = document.getElementById('team2').value.trim();
+      const score1 = document.getElementById('score1').value;
+      const score2 = document.getElementById('score2').value;
+      const yellow1 = parseInt(document.getElementById('yellow1').value || 0);
+      const red1 = parseInt(document.getElementById('red1').value || 0);
+      const yellow2 = parseInt(document.getElementById('yellow2').value || 0);
+      const red2 = parseInt(document.getElementById('red2').value || 0);
+      const date = document.getElementById('date').value;
+      const time = document.getElementById('time').value;
+      const location = document.getElementById('location').value.trim();
+
+      if ((!poule && !phaseFinale) || !journee || !team1 || !team2 || !date || !time || !location) {
+        alert("Remplis tous les champs et choisis une poule OU une phase finale.");
+        return;
+      }
+
+      if (team1.toLowerCase() === team2.toLowerCase()) {
+        alert("Une équipe ne peut pas jouer contre elle-même !");
+        return;
+      }
+
+      let winner = null;
+      if (score1 !== '' && score2 !== '') {
+        const s1 = parseInt(score1);
+        const s2 = parseInt(score2);
+        winner = s1 > s2 ? team1 : s2 > s1 ? team2 : null;
+      }
+
+      const match = {
+        id: Date.now(),
+        poule: poule || null,
+        phaseFinale: phaseFinale || null,
+        journee,
+        team1,
+        team2,
+        score1: score1 !== '' ? parseInt(score1) : null,
+        score2: score2 !== '' ? parseInt(score2) : null,
+        yellow1,
+        red1,
+        yellow2,
+        red2,
+        date,
+        time,
+        location,
+        winner
+      };
+
+      matches.push(match);
+      saveMatches();
+      renderMatches();
+      document.getElementById('matchForm').reset();
+    }
+
+    function resetTournament() {
+      if (confirm("Supprimer tous les matchs ?")) {
+        matches = [];
+        saveMatches();
+        renderMatches();
+      }
+    }
+
+    function deleteMatch(id) {
+      if (confirm("Supprimer ce match ?")) {
+        matches = matches.filter(m => m.id !== id);
+        saveMatches();
+        renderMatches();
+      }
+    }
+
+    function renderMatches() {
+      const container = document.getElementById('matchesContainer');
+      container.innerHTML = '';
+
+      // Affichage Poules A et B
+      ['A', 'B'].forEach(poule => {
+        const section = document.createElement('section');
+        section.innerHTML = `<h2>Matchs Poule ${poule}</h2>
+        <table>
+          <thead><tr><th>Journée</th><th>Équipe 1</th><th>Score</th><th>Équipe 2</th><th>Score</th><th>Lieu</th><th>Date</th><th>Heure</th><th>Action</th></tr></thead>
+          <tbody id="tablePoule${poule}"></tbody>
+        </table>`;
+        container.appendChild(section);
+      });
+
+      // Phases finales
+      ['Quart de finale', 'Demi-finale', 'Finale'].forEach(phase => {
+        const section = document.createElement('section');
+        const id = phase.replace(/\s+/g, '');
+        section.innerHTML = `<h2>${phase}</h2>
+        <table>
+          <thead><tr><th>Journée</th><th>Équipe 1</th><th>Score</th><th>Équipe 2</th><th>Score</th><th>Lieu</th><th>Date</th><th>Heure</th><th>Action</th></tr></thead>
+          <tbody id="tablePhase${id}"></tbody>
+        </table>`;
+        container.appendChild(section);
+      });
+
+      // Injection des lignes
+      matches.forEach(match => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${match.journee}</td>
+          <td>${match.team1}</td>
+          <td>${match.score1 !== null ? match.score1 : '-'}</td>
+          <td>${match.team2}</td>
+          <td>${match.score2 !== null ? match.score2 : '-'}</td>
+          <td>${match.location}</td>
+          <td>${match.date}</td>
+          <td>${match.time}</td>
+          <td><button onclick="deleteMatch(${match.id})">Supprimer</button></td>
+        `;
+        if (match.poule) {
+          const table = document.getElementById(`tablePoule${match.poule}`);
+          table.appendChild(row);
+        } else if (match.phaseFinale) {
+          const id = match.phaseFinale.replace(/\s+/g, '');
+          const table = document.getElementById(`tablePhase${id}`);
+          table.appendChild(row);
+        }
+      });
+    }
+
+    document.getElementById('matchForm').addEventListener('submit', addMatch);
+    renderMatches();
+  </script>
+
+</body>
+</html>

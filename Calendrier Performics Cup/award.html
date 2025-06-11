@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Awards - Performics Cup</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .award {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .award img {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 50%;
+      margin-right: 20px;
+      border: 3px solid #ffa500;
+    }
+    .award span {
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="branding">
+    <img src="logo.jpg" alt="Logo Performics">
+    <span>Performics Cup</span>
+  </div>
+  <nav>
+    <a href="index.html">Accueil</a>
+    <a href="calendrier.html">Calendrier</a>
+    <a href="resultats.html">Résultats</a>
+    <a href="classement.html">Classement</a>
+    <a href="buteurs.html">Buteurs</a>
+    <a href="award.html" class="active">Awards</a>
+    <a href="contact.html">Contact</a>
+  </nav>
+</header>
+
+<main>
+  <h1>Awards Performics Cup</h1>
+
+  <div class="award">
+    <img id="imgBestPlayer" src="G8.jpg" alt="Meilleur joueur">
+    <span><strong>Meilleur joueur :</strong> <span id="bestPlayer">À définir</span></span>
+  </div>
+
+  <div class="award">
+    <img id="imgTopScorer" src="G14.jpg" alt="Meilleur buteur">
+    <span><strong>Meilleur buteur :</strong> <span id="topScorer">À définir</span></span>
+  </div>
+
+  <div class="award">
+    <img id="imgBestKeeper" src="placeholder.jpg" alt="Meilleur gardien">
+    <span><strong>Meilleur gardien :</strong> <span id="bestKeeper">À définir</span></span>
+  </div>
+
+  <div class="award">
+    <img id="imgFairPlay" src="placeholder.jpg" alt="Équipe fair-play">
+    <span><strong>Équipe fair-play :</strong> <span id="fairPlay">À définir</span></span>
+  </div>
+
+</main>
+
+<footer>
+  &copy; 2025 Performics Cup. Tous droits réservés.
+</footer>
+
+<script>
+  const awards = JSON.parse(localStorage.getItem("awards")) || {
+    bestPlayer: { name: "NGAGNE ", img: "G8.jpg" },
+    topScorer: { name: "BONA", img: "G14.jpg" },
+    bestKeeper: { name: "À définir", img: "placeholder.jpg" },
+    fairPlay: { name: "À définir", img: "placeholder.jpg" }
+  };
+
+  document.getElementById("bestPlayer").textContent = awards.bestPlayer.name;
+  document.getElementById("imgBestPlayer").src = awards.bestPlayer.img;
+
+  document.getElementById("topScorer").textContent = awards.topScorer.name;
+  document.getElementById("imgTopScorer").src = awards.topScorer.img;
+
+  document.getElementById("bestKeeper").textContent = awards.bestKeeper.name;
+  document.getElementById("imgBestKeeper").src = awards.bestKeeper.img;
+
+  document.getElementById("fairPlay").textContent = awards.fairPlay.name;
+  document.getElementById("imgFairPlay").src = awards.fairPlay.img;
+</script>
+
+</body>
+</html>

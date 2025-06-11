@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Galerie - Performics Cup</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .galerie-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px;
+      padding: 20px;
+    }
+
+    .galerie-container img, .galerie-container video {
+      width: 100%;
+      height: 230px; /* Hauteur uniforme */
+      object-fit: cover; /* Remplissage sans déformation */
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+      transition: transform 0.3s ease;
+    }
+
+    .galerie-container img:hover,
+    .galerie-container video:hover {
+      transform: scale(1.03);
+    }
+
+    .galerie-container video {
+      max-height: 230px; /* Uniforme avec les images */
+    }
+
+    h1 {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #f8f8f8;
+    }
+
+    header {
+      background: #fff;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #ccc;
+    }
+
+    header img {
+      height: 40px;
+      margin-right: 10px;
+    }
+
+    nav a {
+      margin-left: 20px;
+      text-decoration: none;
+      color: #ff8000;
+      font-weight: bold;
+    }
+
+    nav a.active {
+      color: orange;
+    }
+
+    footer {
+      text-align: center;
+      padding: 15px;
+      background: #fff;
+      border-top: 1px solid #ccc;
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="branding">
+    <img src="logo.jpg" alt="Logo Performics">
+    <span>Performics Cup</span>
+  </div>
+  <nav>
+    <a href="index.html">Accueil</a>
+    <a href="galerie.html" class="active">Galerie</a>
+    <a href="calendrier.html">Calendrier</a>
+    <a href="resultats.html">Résultats</a>
+    <a href="classement.html">Classement</a>
+  </nav>
+</header>
+
+<main>
+  <h1>Galerie Photo & Vidéo</h1>
+  <div class="galerie-container">
+    <!-- Photos Performics Cup -->
+    <img src="G9.jpg" alt="Remise de trophée Performics Cup">
+    <img src="G13.jpg" alt="Meilleur buteur avec trophée">
+    <img src="G17.jpg" alt="Match">
+    <img src="G6.jpg" alt="Match">
+    <img src="G19.jpg" alt="Match">
+    <img src="G15.jpg" alt="Match">
+    <img src="G22.jpg" alt="Match">
+    <img src="G16.jpg" alt="Match">
+    <img src="G1 - Copie.jpg" alt="Match">
+    <img src="G2 - Copie.jpg" alt="Match">
+    <img src="G3.jpg" alt="Match">
+    <img src="G4.jpg" alt="Match">
+    <img src="G5.jpg" alt="Match">
+    <img src="G7.jpg" alt="Match">
+    <img src="G8.jpg" alt="Match">
+    <img src="G10.jpg" alt="Match">
+    <img src="G11.jpg" alt="Match">
+    <img src="G12.jpg" alt="Match">
+
+    <!-- Vidéo -->
+    <video controls>
+      <source src="G23.mp4" type="video/mp4">
+      Votre navigateur ne supporte pas la lecture vidéo.
+    </video>
+  </div>
+</main>
+
+<footer>
+  &copy; 2025 Performics Cup. Tous droits réservés.
+</footer>
+
+</body>
+</html>

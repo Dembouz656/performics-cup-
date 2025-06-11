@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Statistiques - Performics Cup</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <div class="branding">
+    <img src="logo.jpg" alt="Logo Performics">
+    <span>Performics Cup</span>
+  </div>
+  <nav>
+    <a href="index.html">Accueil</a>
+    <a href="calendrier.html">Calendrier</a>
+    <a href="resultats.html">Résultats</a>
+    <a href="classement.html">Classement</a>
+    <a href="buteurs.html">Buteurs</a>
+    <a href="statistiques.html" class="active">Statistiques</a>
+    <a href="contact.html">Contact</a>
+  </nav>
+</header>
+
+<main>
+  <h1>Statistiques du Tournoi</h1>
+  <div class="stats-container">
+    <div class="stat"><strong id="totalMatchs">0</strong><span>Matchs joués</span></div>
+    <div class="stat"><strong id="totalButs">0</strong><span>Buts marqués</span></div>
+    <div class="stat"><strong id="totalJaunes">0</strong><span>Cartons jaunes</span></div>
+    <div class="stat"><strong id="totalRouges">0</strong><span>Cartons rouges</span></div>
+    <div class="stat"><strong id="moyenneButs">0</strong><span>Moy. buts / match</span></div>
+    <div class="stat"><strong id="moyenneCartons">0</strong><span>Moy. cartons / match</span></div>
+  </div>
+</main>
+
+<footer>
+  &copy; 2025 Performics Cup. Tous droits réservés.
+</footer>
+
+<script>
+  const matches = JSON.parse(localStorage.getItem('matches')) || [];
+
+  let totalMatchs = 0, totalButs = 0, jaunes = 0, rouges = 0;
+
+  matches.forEach(m => {
+    if (m.score1 !== null && m.score2 !== null) {
+      totalMatchs++;
+      totalButs += m.score1 + m.score2;
+      jaunes += (m.yellow1 || 0) + (m.yellow2 || 0);
+      rouges += (m.red1 || 0) + (m.red2 || 0);
+    }
+  });
+
+  const moyenneButs = totalMatchs > 0 ? (totalButs / totalMatchs).toFixed(2) : 0;
+  const moyenneCartons = totalMatchs > 0 ? ((jaunes + rouges) / totalMatchs).toFixed(2) : 0;
+
+  document.getElementById('totalMatchs').textContent = totalMatchs;
+  document.getElementById('totalButs').textContent = totalButs;
+  document.getElementById('totalJaunes').textContent = jaunes;
+  document.getElementById('totalRouges').textContent = rouges;
+  document.getElementById('moyenneButs').textContent = moyenneButs;
+  document.getElementById('moyenneCartons').textContent = moyenneCartons;
+</script>
+
+<style>
+  .stats-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 2em;
+  }
+
+  .stat {
+    background: #fff4e6;
+    border: 2px solid #ff6f00;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    min-width: 150px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  }
+
+  .stat strong {
+    display: block;
+    font-size: 2em;
+    color: #ff6f00;
+  }
+
+  .stat span {
+    font-size: 1em;
+    color: #444;
+  }
+</style>
+
+</body>
+</html>
